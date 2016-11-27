@@ -34,7 +34,9 @@ export class MapComponent implements OnInit {
     console.log('setPeersPosition()');
   }
   setMyCurrentPosition(data) {
+    console.log('setMyCurrentPosition(1)');
     if(this.loggedIn === true) {
+      console.log('setMyCurrentPosition(2)');
       this.latitude = data[data.length - 1].position.latitude;
       this.longitude = data[data.length - 1].position.longitude;
     }

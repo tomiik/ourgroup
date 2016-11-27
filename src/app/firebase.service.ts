@@ -136,16 +136,18 @@ export class FirebaseService {
     this.userId = id;
     this.fbMyPeersList = this.af.database.list('/peerslist/' + this.userId);
     this.fbMyPeersList.subscribe(peers => this.peers = peers);
-    this.fbMyPosition = this.af.database.list('/position/' + this.userId);    
+    this.fbMyPosition = this.af.database.list('/position/' + this.userId);
   }
   getMyPosition() {
     return this.fbMyPosition;
   }
   updateMyLocation() {
+    console.log("updateMyLocation()")
     this.inputTime = Date.now();
     navigator.geolocation.getCurrentPosition(position => this.saveMyPosition(position));
   }
   saveMyPosition(pos) {
+    console.log("saveMyPosition()")
     this.fbMyPosition.push(
     {
       time: this.inputTime,
@@ -237,10 +239,10 @@ export class FirebaseService {
 
   refreshPeersPosition() {
     console.log('refreshPeersPosition()');
-    console.log("refreshPeersPosition()");
+    //console.log("refreshPeersPosition()");
     let data = this.peers;
     let peersPositions = [];
-    console.log(data);
+    //console.log(data);
     for (let i = 0; i < data.length; i++) {
       //  console.log("id=" + data[i].id);
     if (data[i].allowed === true) {
@@ -258,10 +260,10 @@ export class FirebaseService {
   }
   startAutoRefresh() {
     console.log('startAutoRefresh()');
-    this.timer = Observable.interval(1000);
+    this.timer = Observable.interval(3000);
     this.autoRefreshSubscribe = this.timer.subscribe(t => {
-      this.refreshPeersPosition();
       this.updateMyLocation();
+      this.refreshPeersPosition();
     });
   }
   stopAutoRefresh() {
