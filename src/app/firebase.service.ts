@@ -10,6 +10,8 @@ export class FirebaseService {
   fbMyPosition: FirebaseListObservable<any>;
   fbMyMutters: FirebaseListObservable<any>;
 
+  fbMyUserInfo: FirebaseListObservable<any>;
+
   fbUsers: FirebaseListObservable<any>;
   users = [];
 
@@ -20,6 +22,8 @@ export class FirebaseService {
   myLng: number = 7.809007;
   inputTime: number;
   peers;
+
+  myUid: string = '';
 
   myName: string = '';
   public bsMyName: BehaviorSubject<any> = new BehaviorSubject([]);
@@ -37,6 +41,7 @@ export class FirebaseService {
     //   });
     this.bsMyName.subscribe((name) => this.myName);
 
+
     this.fbUsers = af.database.list('/users/');
     this.fbUsers.subscribe(users => this.users = users);
 
@@ -52,21 +57,20 @@ export class FirebaseService {
   }
   loggedon(uid) {
     let exist = false;
-    console.log('loggedin:' + uid);
-    console.log(this.users);
-    for (let i = 0; i < this.users.length; i++) {
-      console.log(this.users[i]);
-      if (this.users[i].uid === uid) {
-        exist = true;
-        this.myKey = this.users[i].$key;
-        this.myName = this.users[i].name;
-        this.bsMyName.next(this.myName);
-        console.log("KnownUser()" + this.myKey);
-        break;
-      }
+    // console.log('loggedin:' + uid);
+    // console.log(this.users);
+    let user = this.users.filter(item => item.uid === uid);
+     if (user.length > 0) {
+     user = user[0];
+      exist = true;
+      this.myKey = user['$key'];
+      this.myName = user['name'];
+      this.bsMyName.next(this.myName);
+      console.log("KnownUser()" + this.myKey);
     }
+
     if ( exist === false ) {
-      this.addUser(uid, this.myName, this.users.length);
+      this.addUser(uid, this.myName, this.users.length + 1);
     }
   }
   addUser(uid, name, id) {
@@ -95,6 +99,7 @@ export class FirebaseService {
       this.bsMyName.next(name);
   }
   login(email: string, password: string) {
+
     console.log("login:" + email + "/" + password);
     this.myName = email;
     this.af.auth.login({
@@ -130,20 +135,58 @@ export class FirebaseService {
   }
   addPeer(id: number) {
     console.log('addPeer(' + id + ')');
-    this.fbMyPeersList.push({
-      id: id,
-      allowed: true,
-    })
+    let peerlist = [];
+    this.fbMyPeersList.subscribe(data => peerlist = data);
+    let exist = peerlist.filter(data => data.id === id);
+    if(exist.length == 0){
+      let color = "'red'";
+      switch (peerlist.length) {
+        case 0: color = "LightSeaGreen"; break;
+        case 1: color = "LightSalmon"; break;
+        case 2: color = "MediumTurquoise"; break;
+        case 3: color = "Orange"; break;
+        case 4: color = "SlateBlue"; break;
+      }
+      this.fbMyPeersList.push({
+        id: id,
+        color: color,
+        allowed: true,
+      })
+    }
+  }
+  getNameById(id) {
+    console.log('getNameById' + id);
+    console.log(this.users);
+    let user = this.users.filter(item => item.id === id);
+    console.log(user);
+    let ret: string = '';
+    if (user.length >= 0) {
+      ret = user[0]['name'];
+    }
 
+    return ret;
+  }
+
+  getColorById(id) {
+    console.log('getColorById' + id);
+    //console.log(this.peers);
+    let user = this.peers.filter(item => item.id === id);
+    //console.log(user);
+    let ret: string = '';
+    if (user.length >= 0) {
+      ret = user[0]['color'];
+    }
+    console.log(ret)
+    return ret;
   }
   getPositionById(id) {
     console.log('getPositionById' + id);
 
     let pos = this.af.database.list('/position/' + id, {
-    query: {
-      limitToLast: 1,
-      orderByKey: true
-    }
+      query: {
+        limitToLast: 1,
+        orderByKey: true
+      }
     });
     let ret;
     pos.subscribe((posList) => {
@@ -159,19 +202,21 @@ export class FirebaseService {
     console.log('refreshPeersPosition()');
     // console.log("refreshPeersPosition()");
     let data = this.peers;
-    this.peersPositions = [];
+    let peersPositions = [];
     // console.log(data);
     for (let i = 0; i < data.length; i++) {
       //  console.log("id=" + data[i].id);
     if (data[i].allowed === true) {
-         this.peersPositions.push({
+         peersPositions.push({
            id: data[i].id,
+           name: this.getNameById(data[i].id),
+           color: this.getColorById(data[i].id),
            position: this.getPositionById(data[i].id)
          });
     }
       //  console.log(data[i].id);
       //  console.log(this.getPositionById(data[i].id));
     }
-    this.bsPeersPositions.next(this.peersPositions);
+    this.bsPeersPositions.next(peersPositions);
   }
 }

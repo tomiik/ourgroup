@@ -12,8 +12,8 @@ export class ChatboxComponent implements OnInit {
   peersPositions;
   timer;
   constructor(private firebaseService: FirebaseService) {
-    this.firebaseService.bsPeersPositions.subscribe((peersPositions) => {
-      this.refreshPeersPositions( peersPositions )});
+    //this.firebaseService.bsPeersPositions.subscribe((peersPositions) => {
+    //  this.refreshPeersPositions( peersPositions )});
   }
   refreshPeersPositions(data) {
     this.peersPositions = data;

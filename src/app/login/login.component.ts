@@ -9,6 +9,8 @@ import { FirebaseService } from '../firebase.service';
 })
 export class LoginComponent implements OnInit {
   myName: string = '';
+  email: string ='a@a.aaa';
+  password: string ='aaaaaa';
   constructor(private af: AngularFire, private firebaseService: FirebaseService) {
     // this.af.auth.subscribe(auth => console.log(auth));
     this.firebaseService.bsMyName.subscribe( (myName) => this.myName = myName);
@@ -16,8 +18,8 @@ export class LoginComponent implements OnInit {
 
   ngOnInit() {
   }
-  login() {
-     this.firebaseService.login("g244103x@gmail.com", "123456");
+  login(email: string, password: string) {
+     this.firebaseService.login(email, password);
    }
 
    logout() {

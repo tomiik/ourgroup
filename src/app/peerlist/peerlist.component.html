@@ -1,3 +1,5 @@
-<p>
-  peerlist works!
-</p>
+<div *ngFor="let item of peersPositions" style="backgroundColor: {{item.color}}">
+  <div class="{{item.color}}">
+    {{item.id}}:{{item.name}}[lng={{item.position.longitude}},lat={{item.position.latitude}}
+  </div>
+</div>

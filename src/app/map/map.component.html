@@ -3,15 +3,13 @@
   <sebm-google-map-circle *ngFor="let item of peersPositions"
                             [latitude]="item.position.latitude"
                             [longitude]="item.position.longitude"
-                            [fillColor]="'red'"
+                            [fillColor]=item.color
                             [fillOpacity]="1.0"
-                            [strokeColor]="'red'"
+                            [strokeColor]="item.color"
                             [strokeOpacity]="0.0"
                             [radius]="20"
                             ></sebm-google-map-circle>
-
 </sebm-google-map>
-<div *ngFor="let item of peersPositions" class="">
-  {{item.id}}: {{item.position.latitude}}
-
+<div *ngFor="let item of peersPositions">
+  {{item.id}}:{{item.color}}
 </div>
