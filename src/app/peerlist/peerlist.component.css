@@ -15,6 +15,12 @@ i {
   -moz-user-select: none;
   cursor: pointer;
 }
+.mediumblue{
+  background-color: mediumblue;
+}
+.slateblue {
+  background-color: slateblue;
+}
 .hotpink {
   background-color: HotPink;
 }
@@ -27,8 +33,14 @@ i {
 .mediumturquoise {
   background-color: MediumTurquoise;
 }
+.limegreen {
+  background-color: limegreen;
+}
 .orange {
   background-color: Orange;
+}
+.dodgerblue {
+  background-color: dodgerblue;
 }
 .slateBlue {
   background-color: SlateBlue;

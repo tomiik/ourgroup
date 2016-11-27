@@ -135,12 +135,14 @@ export class FirebaseService {
       this.setUserId(this.userId);
     }
     this.bsLoggedIn.next(true);
+    this.mutter(' Log in: ' + this.myName);
     this.startAutoRefresh();
   }
 
   logout() {
    this.af.auth.logout();
    this.bsLoggedIn.next(false);
+   this.mutter(' Log out: ' + this.myName);
    this.stopAutoRefresh();
   }
   setUserId(id) {
@@ -222,6 +224,9 @@ export class FirebaseService {
     return ret;
   }
   getColorById(id) {
+    if(id === 0){
+      return 'black';
+    }
     // this.log('getColorById' + id);
     // this.log(this.peers);
     let user = this.peers.filter(item => item.id === id);
@@ -254,7 +259,7 @@ export class FirebaseService {
     pos.subscribe((posList) => {
       ret = posList[posList.length - 1];
     });
-    return ret['position'];
+    return {position: ret['position'], time: ret['time']};
   }
 
   refreshPeersPosition() {
@@ -266,11 +271,13 @@ export class FirebaseService {
     for (let i = 0; i < data.length; i++) {
       //  this.log("id=" + data[i].id);
     if (data[i].allowed === true) {
+      let pos = this.getPositionById(data[i].id);
          peersPositions.push({
            id: data[i].id,
            name: this.getNameById(data[i].id),
            color: this.getColorById(data[i].id),
-           position: this.getPositionById(data[i].id)
+           position: pos['position'],
+           time: pos['time'] - Date.now(),
          });
     }
       //  this.log(data[i].id);

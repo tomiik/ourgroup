@@ -32,7 +32,7 @@ export class ChatboxComponent implements OnInit {
       if ( color !== '' ) {
         count++;
       }
-      if ( count < 5 ){
+      if ( count < 8 ){
         this.mutters[i].color = color;
       } else {
         this.mutters[i].color = '';
@@ -94,7 +94,7 @@ export class ChatboxComponent implements OnInit {
   }
   sendMutter(str){
     if (str !== '') {
-      this.firebaseService.mutter(str);      
+      this.firebaseService.mutter(str);
     }
     this.mutter = '';
   }

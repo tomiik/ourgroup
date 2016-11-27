@@ -1,14 +1,14 @@
 <div *ngIf="mutters.length > 0">
   <div *ngFor="let item of mutters">
     <div *ngIf="item.color !== ''">
-      {{item.time | date:'MM/dd/yyyy @hh:mm'}}<span id="name" class="{{item.color | lowercase}}">{{item.name}}</span>{{item.mutter}}
+      {{item.time | date:'MM/dd/yy @hh:mm'}}<span id="name" class="{{item.color | lowercase}}">{{item.name}}</span>{{item.mutter}}
     </div>
   </div>
 </div>
 <form (ngSubmit)="enterkey(mutter)">
-  <div class="row">
-    <input type="text" class="col s10" [(ngModel)]="mutter" name="mutter">
-    <button class="btn col s2" (click)="sendMutter(mutter)">mutter</button>
+  <div id="chatbox" class="row">
+    <input id="chatbox-input" type="text" class="col s8" [(ngModel)]="mutter" name="mutter">
+    <button class="btn col s4" (click)="sendMutter(mutter)">mutter</button>
   </div>
 </form>
 <!--

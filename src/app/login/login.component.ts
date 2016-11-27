@@ -24,7 +24,9 @@ export class LoginComponent implements OnInit {
       this.myName = myName;
       this.newName = myName;
     });
-    this.firebaseService.bsLoggedIn.subscribe((status) => {this.loggedIn = status});
+    this.firebaseService.bsLoggedIn.subscribe((status) => {
+      this.loggedIn = status;
+    });
 
     this.firebaseService.fbMyPeersList.subscribe(() => this.peerListLoaded = true);
     this.firebaseService.fbUsers.subscribe(() => this.userLoaded = true);

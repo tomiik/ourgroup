@@ -1,6 +1,12 @@
 body{
   font-weight: bold;
 }
+#chatbox {
+  margin-bottom: 0;
+}
+#chatbox-input {
+  margin-bottom: 0;
+}
 #name {
   color: white;
   border-radius: 10px;
@@ -9,20 +15,32 @@ body{
   margin-left: 0.5em;
   margin-right: 0.5em;
 }
+.slateblue {
+  background-color: slateblue;
+}
+.mediumblue {
+  background-color: mediumblue;
+}
+.dodgerblue {
+  background-color: dodgerblue;
+}
+.limegreen {
+  background-color: limegreen;
+}
 .hotpink {
-  background-color: HotPink;
+  background-color: hotpink;
 }
 .lightsalmon {
-  background-color: LightSalmon;
+  background-color: lightsalmon;
 }
 .lightseagreen {
-  background-color: LightSeaGreen !important;
+  background-color: lightseagreen;
 }
 .mediumturquoise {
-  background-color: MediumTurquoise;
+  background-color: mediumturquoise;
 }
 .orange {
-  background-color: Orange;
+  background-color: orange;
 }
 .slateBlue {
   background-color: SlateBlue;

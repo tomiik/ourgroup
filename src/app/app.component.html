@@ -1,4 +1,12 @@
-<us-app-map></us-app-map>
-<us-app-peerlist></us-app-peerlist>
-<us-app-chatbox *ngIf="loggedIn"></us-app-chatbox>
-<us-app-login></us-app-login>
+<div class="container">
+  <div id="login">
+    <us-app-login></us-app-login>
+  </div>
+  <div id="map">
+    <us-app-map></us-app-map>
+  </div>
+  <div id="peerlist-n-chat">
+    <us-app-peerlist></us-app-peerlist>
+    <us-app-chatbox *ngIf="loggedIn"></us-app-chatbox>
+  </div>
+</div>
