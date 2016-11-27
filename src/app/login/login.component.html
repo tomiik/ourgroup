@@ -1,10 +1,6 @@
 <div class="row" *ngIf="loggedIn">
    <div id="name">
-      {{myName}}
-      <a href="#modal-changename">
-         <i id="edit" class="fa fa-pencil" aria-hidden="true"></i>
-      </a>
-
+      {{myName}}<a href="#modal-changename"><i id="edit" class="fa fa-pencil" aria-hidden="true"></i></a>
    </div>
    <button class="btn col s12" (click)="logout()">Logout</button>
 </div>
@@ -20,7 +16,8 @@
          <label for="password">password</label>
        </div>
      </div>
-     <button class="btn col s12" (click)="login(email, password)" [class.locating]="locating">Login</button>
+     <button id="login-button" class="btn col s12" (click)="login(email, password)" [class.locating]="locating" [class.loaded]="myPositionLoaded && userLoaded && peerListLoaded">Login</button>
+     <div id="login-message" [class.loaded]="myPositionLoaded && userLoaded && peerListLoaded">Loading...</div>
    </form>
  </div>
 

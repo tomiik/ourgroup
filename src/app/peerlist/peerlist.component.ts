@@ -28,10 +28,8 @@ export class PeerlistComponent implements OnInit {
   }
   refreshPeersPositions(data) {
     this.peersPositions = data;
-    this.peersPositions = data;
-    console.log('refreshPeersPositions()');
-    console.log(data);
-
+    //console.log('refreshPeersPositions()');
+    //console.log(data);
   }
 
   ngOnInit() {

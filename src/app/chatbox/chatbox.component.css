@@ -1,0 +1,29 @@
+body{
+  font-weight: bold;
+}
+#name {
+  color: white;
+  border-radius: 10px;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+}
+.hotpink {
+  background-color: HotPink;
+}
+.lightsalmon {
+  background-color: LightSalmon;
+}
+.lightseagreen {
+  background-color: LightSeaGreen !important;
+}
+.mediumturquoise {
+  background-color: MediumTurquoise;
+}
+.orange {
+  background-color: Orange;
+}
+.slateBlue {
+  background-color: SlateBlue;
+}

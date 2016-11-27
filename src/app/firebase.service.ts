@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { AngularFire, FirebaseListObservable } from 'angularfire2';
 import { BehaviorSubject } from 'rxjs';
 import { Observable } from 'rxjs/Rx';
+import { Util } from './lib'
+const log: boolean = true;
 
 @Injectable()
 export class FirebaseService {
@@ -14,7 +16,7 @@ export class FirebaseService {
 
   fbMyPeersList: FirebaseListObservable<any>;
   fbMyPosition: FirebaseListObservable<any>;
-  fbMyMutters: FirebaseListObservable<any>;
+  fbMutters: FirebaseListObservable<any>;
 
   fbMyUserInfo: FirebaseListObservable<any>;
 
@@ -42,7 +44,7 @@ export class FirebaseService {
 
   constructor(private af: AngularFire) {
     // this.af.auth.subscribe(auth => {
-    //     console.log(auth);
+    //     this.log(auth);
     //     this.loggedon(auth.uid);
     //   });
     this.bsLoggedIn.next(false);
@@ -55,12 +57,22 @@ export class FirebaseService {
     this.fbMyPeersList = af.database.list('/peerslist/' + this.userId);
     this.fbMyPeersList.subscribe(peers => this.peers = peers);
 
-    this.fbMyPosition = af.database.list('/position/' + this.userId);
+    this.fbMyPosition = af.database.list('/position/' + this.userId,{
+    query: {
+      limitToLast: 1,
+      orderByKey: true
+    }});
 
     this.fbAllPositions = af.database.list('/position/');
     this.fbAllPositions.subscribe((allPositions) => this.allPositions = allPositions);
 
-    // this.fbMyMutters = af.database.list('/mutters/' + this.userId);
+//    this.fbMyMutters = af.database.list('/mutters/' + this.userId);
+    this.fbMutters = af.database.list('/mutters/',
+    {
+    query: {
+      limitToLast: 20,
+      orderByKey: true
+    }});
   }
   addUser(uid, name, id) {
   this.fbUsers.push(
@@ -70,7 +82,7 @@ export class FirebaseService {
       id: id,
     })
     .then(() => {
-      console.log('added()');
+      this.log('added()');
       let key = this.users[this.users.length - 1].$key;
       this.myKey = key;
       this.bsMyName.next(this.myName);
@@ -80,7 +92,7 @@ export class FirebaseService {
     this.setName(name, this.myKey);
   }
   setName(name, key) {
-    console.log('setName: ' + this.myName + ' -> ' + name + ',key:' + key);
+    this.log('setName: ' + this.myName + ' -> ' + name + ',key:' + key);
     this.fbUsers.update(key,
       {
         name: name,
@@ -88,24 +100,24 @@ export class FirebaseService {
       this.bsMyName.next(name);
   }
   login(email: string, password: string) {
-    console.log('login:' + email + '/' + password);
+    this.log('login:' + email + '/' + password);
     this.myName = email;
     this.af.auth.login({
       email: email,
       password: password,
     }).then((auth) => {
-      console.log(auth);
+      this.log(auth);
       this.loggedon(auth.uid);
       // this.af.auth.subscribe(auth => {
-      //     console.log(auth);
+      //     this.log(auth);
       //     this.loggedon(auth.uid);
       //   });
     });
   }
   loggedon(uid) {
     let exist = false;
-    // console.log('loggedin:' + uid);
-    // console.log(this.users);
+    // this.log('loggedin:' + uid);
+    // this.log(this.users);
     let user = this.users.filter(item => item.uid === uid);
      if (user.length > 0) {
      user = user[0];
@@ -114,7 +126,7 @@ export class FirebaseService {
       this.myName = user['name'];
       this.userId = user['id'];
       this.bsMyName.next(this.myName);
-      console.log('KnownUser(): ' + this.myKey);
+      this.log('KnownUser(): ' + this.myKey);
       this.setUserId(this.userId);
     }
 
@@ -132,7 +144,7 @@ export class FirebaseService {
    this.stopAutoRefresh();
   }
   setUserId(id) {
-    console.log("setUserId(" + id + ")")
+    this.log("setUserId(" + id + ")")
     this.userId = id;
     this.fbMyPeersList = this.af.database.list('/peerslist/' + this.userId);
     this.fbMyPeersList.subscribe(peers => this.peers = peers);
@@ -142,12 +154,12 @@ export class FirebaseService {
     return this.fbMyPosition;
   }
   updateMyLocation() {
-    console.log("updateMyLocation()")
+    this.log("updateMyLocation()")
     this.inputTime = Date.now();
     navigator.geolocation.getCurrentPosition(position => this.saveMyPosition(position));
   }
   saveMyPosition(pos) {
-    console.log("saveMyPosition()")
+    this.log("saveMyPosition()")
     this.fbMyPosition.push(
     {
       time: this.inputTime,
@@ -159,19 +171,13 @@ export class FirebaseService {
     });
   }
   addPeer(id: number) {
-    console.log('addPeer(' + id + ')');
+    this.log('addPeer(' + id + ')');
     let peerlist = [];
     this.fbMyPeersList.subscribe(data => peerlist = data);
     let exist = peerlist.filter(data => data.id === id);
     if (exist.length === 0) {
       let color = 'red';
-      switch (peerlist.length) {
-        case 0: color = 'LightSeaGreen'; break;
-        case 1: color = 'LightSalmon'; break;
-        case 2: color = 'MediumTurquoise'; break;
-        case 3: color = 'Orange'; break;
-        case 4: color = 'SlateBlue'; break;
-      }
+      color = Util.getColorByNumber(peerlist.length);
       this.fbMyPeersList.push({
         id: id,
         color: color,
@@ -180,21 +186,35 @@ export class FirebaseService {
       .then(() => this.refreshPeersPosition())
     }
   }
+  reColoring() {
+    //console.log("reColoring");
+    let peerlist = [];
+    this.fbMyPeersList.subscribe(data => peerlist = data);
+    for (let i = 0; i < peerlist.length; i++) {
+      this.fbMyPeersList.update(peerlist[i].$key, {
+        color: Util.getColorByNumber(i),
+      });
+    }
+    this.refreshPeersPosition();
+  }
   deletePeer(id) {
-    console.log('delete(' + id + ')');
+    this.log('delete(' + id + ')');
     let peerlist = [];
     this.fbMyPeersList.subscribe(data => peerlist = data);
     let exist = peerlist.filter(data => data.id === id);
     if (exist.length > 0) {
       this.fbMyPeersList.remove(exist[0].$key)
-      .then(() => this.refreshPeersPosition());
+      .then(() => {
+        this.reColoring();
+        //this.refreshPeersPosition()
+      });
     }
   }
   getNameById(id) {
-    // console.log('getNameById' + id);
-    // console.log(this.users);
+     this.log('getNameById' + id);
+     this.log(this.users);
     let user = this.users.filter(item => item.id === id);
-    // console.log(user);
+    // this.log(user);
     let ret = '';
     if (user.length >= 0) {
       ret = user[0]['name'];
@@ -202,20 +222,20 @@ export class FirebaseService {
     return ret;
   }
   getColorById(id) {
-    // console.log('getColorById' + id);
-    // console.log(this.peers);
+    // this.log('getColorById' + id);
+    // this.log(this.peers);
     let user = this.peers.filter(item => item.id === id);
-    // console.log(user);
+    // this.log(user);
     let ret = '';
-    if (user.length >= 0) {
+    if (user.length > 0) {
       ret = user[0]['color'];
     }
-    // console.log(ret)
+    // this.log(ret)
     return ret;
   }
   getIdByUid(uid) {
     let user = this.users.filter(item => item.uid === uid);
-    // console.log(user);
+    // this.log(user);
     let ret = '';
     if (user.length >= 0) {
       ret = user[0]['id'];
@@ -223,7 +243,7 @@ export class FirebaseService {
     return ret;
   }
   getPositionById(id) {
-    // console.log('getPositionById' + id);
+    // this.log('getPositionById' + id);
     let pos = this.af.database.list('/position/' + id, {
       query: {
         limitToLast: 1,
@@ -238,13 +258,13 @@ export class FirebaseService {
   }
 
   refreshPeersPosition() {
-    console.log('refreshPeersPosition()');
-    //console.log("refreshPeersPosition()");
+    this.log('refreshPeersPosition()');
+    //this.log("refreshPeersPosition()");
     let data = this.peers;
     let peersPositions = [];
-    //console.log(data);
+    //this.log(data);
     for (let i = 0; i < data.length; i++) {
-      //  console.log("id=" + data[i].id);
+      //  this.log("id=" + data[i].id);
     if (data[i].allowed === true) {
          peersPositions.push({
            id: data[i].id,
@@ -253,13 +273,13 @@ export class FirebaseService {
            position: this.getPositionById(data[i].id)
          });
     }
-      //  console.log(data[i].id);
-      //  console.log(this.getPositionById(data[i].id));
+      //  this.log(data[i].id);
+      //  this.log(this.getPositionById(data[i].id));
     }
     this.bsPeersPositions.next(peersPositions);
   }
   startAutoRefresh() {
-    console.log('startAutoRefresh()');
+    this.log('startAutoRefresh()');
     this.timer = Observable.interval(3000);
     this.autoRefreshSubscribe = this.timer.subscribe(t => {
       this.updateMyLocation();
@@ -269,5 +289,17 @@ export class FirebaseService {
   stopAutoRefresh() {
     this.autoRefreshSubscribe.unsubscribe();
   }
-
+  log(str) {
+    if (log) {
+      console.log(str);
+    }
+  }
+  mutter(str){
+    let time = Date.now();
+    this.fbMutters.push({
+      id: this.userId,
+      time: time,
+      mutter: str,
+    });
+  }
 }

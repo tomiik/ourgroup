@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { FirebaseService } from './firebase.service';
 
 @Component({
   selector: 'app-root',
@@ -6,8 +7,9 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  constructor() {
-
+  loggedIn: boolean = false;
+  constructor(private firebaseService: FirebaseService) {
+    this.firebaseService.bsLoggedIn.subscribe((status) => this.loggedIn = status);
   }
 
 }

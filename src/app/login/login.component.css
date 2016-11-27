@@ -13,6 +13,15 @@
 #changename-input {
   font-size: 2em;
 }
+#login-button{
+  visibility:hidden;
+}
 .loggedin {
-  visibility: hidden;
+  display:none;
+}
+#login-button.loaded {
+  visibility: visible !important;
+}
+#login-message.loaded {
+  display: none;
 }
