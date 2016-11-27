@@ -11,8 +11,8 @@ declare var $ : any;
 export class LoginComponent implements OnInit {
   myName: string = '';
   newName: string = '';
-  email: string ='a@a.aaa';
-  password: string ='aaaaaa';
+  email: string = 'a@a.aaa';
+  password: string = 'aaaaaa';
   loggedIn: boolean = false;
   constructor(private af: AngularFire, private firebaseService: FirebaseService) {
     // this.af.auth.subscribe(auth => console.log(auth));
