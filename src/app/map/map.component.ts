@@ -14,6 +14,7 @@ export class MapComponent implements OnInit {
   latitude: number;
   longitude: number;
   zoom: number = 16;
+  radius: number = 20;
   peers;
   peersPositions: PeerPosition[];
   constructor(private firebaseService: FirebaseService) {
@@ -40,7 +41,33 @@ export class MapComponent implements OnInit {
       this.latitude = data[data.length - 1].position.latitude;
       this.longitude = data[data.length - 1].position.longitude;
     }
-
-
+  }
+  zoomChanged(zoom){
+    console.log("zoomChange: " + zoom)
+    this.zoom = zoom;
+    switch(zoom){
+      case 22: this.radius = 1; break;
+      case 21: this.radius = 1; break;
+      case 20: this.radius = 2; break;
+      case 19: this.radius = 4; break;
+      case 18: this.radius = 5; break;
+      case 17: this.radius = 10; break;
+      case 16: this.radius = 20; break;
+      case 15: this.radius = 40; break;
+      case 14: this.radius = 50; break;
+      case 13: this.radius = 100; break;
+      case 12: this.radius = 200; break;
+      case 11: this.radius = 400; break;
+      case 10: this.radius = 1000; break;
+      case 9: this.radius = 2000; break;
+      case 8: this.radius = 4000; break;
+      case 7: this.radius = 5000; break;
+      case 6: this.radius = 10000; break;
+      case 5: this.radius = 40000; break;
+      case 4: this.radius = 50000; break;
+      case 3: this.radius = 100000; break;
+      case 2: this.radius = 200000; break;
+      case 1: this.radius = 500000; break;
+    }
   }
 }

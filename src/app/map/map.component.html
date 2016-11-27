@@ -1,4 +1,5 @@
-<sebm-google-map  [latitude]="latitude"
+<sebm-google-map  (zoomChange)="zoomChanged($event)"
+                  [latitude]="latitude"
                   [longitude]="longitude"
                   [streetViewControl]="false"
                   [zoom]="zoom">
@@ -21,7 +22,7 @@
                                 [fillOpacity]="1.0"
                                 [strokeColor]=item.color
                                 [strokeOpacity]="0.0"
-                                [radius]="20"
+                                [radius]="radius"
                                 ></sebm-google-map-circle>
     </div>
   </div>

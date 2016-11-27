@@ -13,6 +13,7 @@ export class PeerlistComponent implements OnInit {
   modal_id: number;
   users = [];
   loggedIn: boolean = false;
+  userId: number = 0;
 
   constructor(private firebaseService: FirebaseService) {
     this.firebaseService.bsPeersPositions.subscribe((peersPositions) => {
@@ -20,7 +21,7 @@ export class PeerlistComponent implements OnInit {
 
     this.firebaseService.fbUsers.subscribe((users) => { this.users = users });
     this.firebaseService.bsLoggedIn.subscribe((status) => this.loggedIn = status);
-
+    this.firebaseService.bsUserId.subscribe((userid) => this.userId = userid);
       $(document).ready(function(){
       // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
         $('.modal').modal();

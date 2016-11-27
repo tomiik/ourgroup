@@ -11,6 +11,9 @@ export class FirebaseService {
   autoRefreshSubscribe;
 
   userId: number = 0;
+  public bsUserId: BehaviorSubject<any> = new BehaviorSubject([]);
+
+
   public bsLoggedIn: BehaviorSubject<any> = new BehaviorSubject([]);
 
 
@@ -151,6 +154,7 @@ export class FirebaseService {
     this.fbMyPeersList = this.af.database.list('/peerslist/' + this.userId);
     this.fbMyPeersList.subscribe(peers => this.peers = peers);
     this.fbMyPosition = this.af.database.list('/position/' + this.userId);
+    this.bsUserId.next(this.userId);
   }
   getMyPosition() {
     return this.fbMyPosition;
