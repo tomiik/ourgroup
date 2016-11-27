@@ -1,6 +1,43 @@
-<div></div>
-{{myName}}
-<input type="text" [(ngModel)]="email" name="email" value="a@a.aaa">
-<input type="text" [(ngModel)]="password" name="password" value="aaaaaa">
-<button (click)="login(email, password)">Login</button>
-<button (click)="logout()">Logout</button>
+<div class="row" *ngIf="loggedIn">
+   <div id="name">
+      {{myName}}
+      <a href="#modal-changename">
+         <i id="edit" class="fa fa-pencil" aria-hidden="true"></i>
+      </a>
+
+   </div>
+   <button class="btn col s12" (click)="logout()">Logout</button>
+</div>
+<div class="row" [class.loggedin]="loggedIn">
+   <form class="col s12">
+     <div class="row">
+       <div class="input-field col s12">
+         <input id="email" [(ngModel)]="email" name="email" type="text" class="validate">
+         <label for="email">email</label>
+       </div>
+       <div class="input-field col s12">
+         <input id="password" [(ngModel)]="password" name="password" type="password" class="validate">
+         <label for="password">password</label>
+       </div>
+     </div>
+     <button class="btn col s12" (click)="login(email, password)" [class.locating]="locating">Login</button>
+   </form>
+ </div>
+
+
+
+ <!-- Modal Structure -->
+ <div id="modal-changename" class="modal bottom-sheet">
+   <h4>Change Name</h4>
+   <div class="modal-content">
+      <div class="input-field col s12">
+        <input id="changename-input" [(ngModel)]="newName" name="changename-input" type="text" class="validate">
+      </div>
+   </div>
+
+
+   <div class="modal-footer">
+      <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat" (click)="changeName(newName)">Change</a>
+      <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat" (click)="changeNameCancel()">Cancel</a>
+   </div>
+ </div>

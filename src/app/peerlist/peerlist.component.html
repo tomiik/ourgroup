@@ -1,5 +1,64 @@
-<div *ngFor="let item of peersPositions" style="backgroundColor: {{item.color}}">
-  <div class="{{item.color}}">
-    {{item.id}}:{{item.name}}[lng={{item.position.longitude}},lat={{item.position.latitude}}
+<!--
+<ul *ngFor="let item of peersPositions" class="{{item.color | lowercase}}" class="collection">
+  <li class="collection-item dismissable">
+    <div>
+      <i class="fa fa-circle" aria-hidden="true"></i>
+      {{item.name}}<a href="#!" class="secondary-content"><i class="material-icons">send</i></a>
+    </div>
+  </li>
+</ul>
+<div class="row">
+  <span *ngFor="let item of peersPositions" class="badge {{item.color | lowercase}}">
+    {{item.name}}
+  </span>
+</div>
+-->
+<!-- Peers -->
+<div *ngIf="loggedIn">  
+  <div *ngFor="let item of peersPositions" class="{{item.color | lowercase}} chip">
+    {{item.name}}
+    <i class="fa fa-times" aria-hidden="true" (click)="deletePeer(item)"></i>
+  </div>
+  <!-- Modal Trigger -->
+  <a href="#modal-addpeer">
+    <div class="chip addbutton">
+        <i class="fa fa-plus" aria-hidden="true"></i>
+    </div>
+  </a>
+</div>
+<!--
+<table id="peers-table" class="bordered">
+  <tr>
+    <th>Name</th>
+    <th>Latitude</th>
+    <th>Longitude</th>
+  </tr>
+    <tr *ngFor="let item of peersPositions" class="{{item.color | lowercase}}">
+    <td>
+      {{item.name}}
+    </td>
+    <td>
+      {{item.position.latitude}}
+    </td>
+    <td>
+      {{item.position.longitude}}
+    </td>
+  </tr>
+</table>
+-->
+
+
+<!-- Modal Structure -->
+<div id="modal-addpeer" class="modal bottom-sheet">
+  <div class="modal-content">
+    <ul class="collection with-header">
+      <li class="collection-header"><h4>Add peer</h4></li>
+      <li  *ngFor="let user of users" class="collection-item dismissable"><div>{{user.name}}<i class="fa fa-plus modal-add" aria-hidden="true" (click)="addPeer(user.id)"></i></div></li>
+    </ul>
+  </div>
+
+
+  <div class="modal-footer">
+    <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat" >Close</a>
   </div>
 </div>

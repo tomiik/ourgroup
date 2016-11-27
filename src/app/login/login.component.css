@@ -1,0 +1,18 @@
+#name {
+  font-size:2em;
+}
+#edit {
+  margin-left: 0.5em;
+}
+#email {
+  font-size: 2em;
+}
+#password {
+  font-size: 2em;
+}
+#changename-input {
+  font-size: 2em;
+}
+.loggedin {
+  visibility: hidden;
+}

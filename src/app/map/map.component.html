@@ -1,4 +1,7 @@
-<sebm-google-map [latitude]="latitude" [longitude]="longitude" [zoom]="zoom">
+<sebm-google-map  [latitude]="latitude"
+                  [longitude]="longitude"
+                  [streetViewControl]="false"
+                  [zoom]="zoom">
   <sebm-google-map-marker [latitude]="latitude" [longitude]="longitude" [label]="'M'"></sebm-google-map-marker>
   <sebm-google-map-circle *ngFor="let item of peersPositions"
                             [latitude]="item.position.latitude"
@@ -10,6 +13,3 @@
                             [radius]="20"
                             ></sebm-google-map-circle>
 </sebm-google-map>
-<div *ngFor="let item of peersPositions">
-  {{item.id}}:{{item.color}}
-</div>

@@ -12,6 +12,7 @@ import { ChatboxComponent } from './chatbox/chatbox.component';
 import { PeerlistComponent } from './peerlist/peerlist.component';
 import { FirebaseService } from './firebase.service';
 import { LoginComponent } from './login/login.component';
+import { TabComponent } from './tab/tab.component';
 
 export const firebaseConfig = {
   apiKey: 'AIzaSyDWL6Tm8w2IziPpVRO0xohPEqwQw8EQhc4',
@@ -32,7 +33,8 @@ const firebaseAuthConfig = {
     MapComponent,
     ChatboxComponent,
     PeerlistComponent,
-    LoginComponent
+    LoginComponent,
+    TabComponent
   ],
   imports: [
     BrowserModule,

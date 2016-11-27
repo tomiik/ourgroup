@@ -1,10 +1,16 @@
 import { Injectable } from '@angular/core';
 import { AngularFire, FirebaseListObservable } from 'angularfire2';
 import { BehaviorSubject } from 'rxjs';
+import { Observable } from 'rxjs/Rx';
 
 @Injectable()
 export class FirebaseService {
-  userId: number = 1;
+  timer; // for Auto Refresh
+  autoRefreshSubscribe;
+
+  userId: number = 0;
+  public bsLoggedIn: BehaviorSubject<any> = new BehaviorSubject([]);
+
 
   fbMyPeersList: FirebaseListObservable<any>;
   fbMyPosition: FirebaseListObservable<any>;
@@ -39,8 +45,9 @@ export class FirebaseService {
     //     console.log(auth);
     //     this.loggedon(auth.uid);
     //   });
-    this.bsMyName.subscribe((name) => this.myName);
+    this.bsLoggedIn.next(false);
 
+    this.bsMyName.subscribe((name) => this.myName);
 
     this.fbUsers = af.database.list('/users/');
     this.fbUsers.subscribe(users => this.users = users);
@@ -53,25 +60,7 @@ export class FirebaseService {
     this.fbAllPositions = af.database.list('/position/');
     this.fbAllPositions.subscribe((allPositions) => this.allPositions = allPositions);
 
-    this.fbMyMutters = af.database.list('/mutters/' + this.userId);
-  }
-  loggedon(uid) {
-    let exist = false;
-    // console.log('loggedin:' + uid);
-    // console.log(this.users);
-    let user = this.users.filter(item => item.uid === uid);
-     if (user.length > 0) {
-     user = user[0];
-      exist = true;
-      this.myKey = user['$key'];
-      this.myName = user['name'];
-      this.bsMyName.next(this.myName);
-      console.log("KnownUser()" + this.myKey);
-    }
-
-    if ( exist === false ) {
-      this.addUser(uid, this.myName, this.users.length + 1);
-    }
+    // this.fbMyMutters = af.database.list('/mutters/' + this.userId);
   }
   addUser(uid, name, id) {
   this.fbUsers.push(
@@ -81,7 +70,7 @@ export class FirebaseService {
       id: id,
     })
     .then(() => {
-      console.log("added()");
+      console.log('added()');
       let key = this.users[this.users.length - 1].$key;
       this.myKey = key;
       this.bsMyName.next(this.myName);
@@ -91,7 +80,7 @@ export class FirebaseService {
     this.setName(name, this.myKey);
   }
   setName(name, key) {
-    console.log('setName' + this.myName + "->" + name + ",key:" + key);
+    console.log('setName: ' + this.myName + ' -> ' + name + ',key:' + key);
     this.fbUsers.update(key,
       {
         name: name,
@@ -99,8 +88,7 @@ export class FirebaseService {
       this.bsMyName.next(name);
   }
   login(email: string, password: string) {
-
-    console.log("login:" + email + "/" + password);
+    console.log('login:' + email + '/' + password);
     this.myName = email;
     this.af.auth.login({
       email: email,
@@ -112,15 +100,50 @@ export class FirebaseService {
       //     console.log(auth);
       //     this.loggedon(auth.uid);
       //   });
-    })
+    });
+  }
+  loggedon(uid) {
+    let exist = false;
+    // console.log('loggedin:' + uid);
+    // console.log(this.users);
+    let user = this.users.filter(item => item.uid === uid);
+     if (user.length > 0) {
+     user = user[0];
+      exist = true;
+      this.myKey = user['$key'];
+      this.myName = user['name'];
+      this.userId = user['id'];
+      this.bsMyName.next(this.myName);
+      console.log('KnownUser(): ' + this.myKey);
+      this.setUserId(this.userId);
+    }
+
+    if ( exist === false ) {
+      this.addUser(uid, this.myName, this.users.length + 1);
+      this.setUserId(this.userId);
+    }
+    this.bsLoggedIn.next(true);
+    this.startAutoRefresh();
+  }
+
+  logout() {
+   this.af.auth.logout();
+   this.bsLoggedIn.next(false);
+   this.stopAutoRefresh();
   }
   setUserId(id) {
+    console.log("setUserId(" + id + ")")
     this.userId = id;
     this.fbMyPeersList = this.af.database.list('/peerslist/' + this.userId);
-    this.fbMyPosition = this.af.database.list('/position/' + this.userId);
+    this.fbMyPeersList.subscribe(peers => this.peers = peers);
+    this.fbMyPosition = this.af.database.list('/position/' + this.userId);    
   }
   getMyPosition() {
     return this.fbMyPosition;
+  }
+  updateMyLocation() {
+    this.inputTime = Date.now();
+    navigator.geolocation.getCurrentPosition(position => this.saveMyPosition(position));
   }
   saveMyPosition(pos) {
     this.fbMyPosition.push(
@@ -138,50 +161,67 @@ export class FirebaseService {
     let peerlist = [];
     this.fbMyPeersList.subscribe(data => peerlist = data);
     let exist = peerlist.filter(data => data.id === id);
-    if(exist.length == 0){
-      let color = "'red'";
+    if (exist.length === 0) {
+      let color = 'red';
       switch (peerlist.length) {
-        case 0: color = "LightSeaGreen"; break;
-        case 1: color = "LightSalmon"; break;
-        case 2: color = "MediumTurquoise"; break;
-        case 3: color = "Orange"; break;
-        case 4: color = "SlateBlue"; break;
+        case 0: color = 'LightSeaGreen'; break;
+        case 1: color = 'LightSalmon'; break;
+        case 2: color = 'MediumTurquoise'; break;
+        case 3: color = 'Orange'; break;
+        case 4: color = 'SlateBlue'; break;
       }
       this.fbMyPeersList.push({
         id: id,
         color: color,
         allowed: true,
       })
+      .then(() => this.refreshPeersPosition())
+    }
+  }
+  deletePeer(id) {
+    console.log('delete(' + id + ')');
+    let peerlist = [];
+    this.fbMyPeersList.subscribe(data => peerlist = data);
+    let exist = peerlist.filter(data => data.id === id);
+    if (exist.length > 0) {
+      this.fbMyPeersList.remove(exist[0].$key)
+      .then(() => this.refreshPeersPosition());
     }
   }
   getNameById(id) {
-    console.log('getNameById' + id);
-    console.log(this.users);
+    // console.log('getNameById' + id);
+    // console.log(this.users);
     let user = this.users.filter(item => item.id === id);
-    console.log(user);
-    let ret: string = '';
+    // console.log(user);
+    let ret = '';
     if (user.length >= 0) {
       ret = user[0]['name'];
     }
-
     return ret;
   }
-
   getColorById(id) {
-    console.log('getColorById' + id);
-    //console.log(this.peers);
+    // console.log('getColorById' + id);
+    // console.log(this.peers);
     let user = this.peers.filter(item => item.id === id);
-    //console.log(user);
-    let ret: string = '';
+    // console.log(user);
+    let ret = '';
     if (user.length >= 0) {
       ret = user[0]['color'];
     }
-    console.log(ret)
+    // console.log(ret)
+    return ret;
+  }
+  getIdByUid(uid) {
+    let user = this.users.filter(item => item.uid === uid);
+    // console.log(user);
+    let ret = '';
+    if (user.length >= 0) {
+      ret = user[0]['id'];
+    }
     return ret;
   }
   getPositionById(id) {
-    console.log('getPositionById' + id);
-
+    // console.log('getPositionById' + id);
     let pos = this.af.database.list('/position/' + id, {
       query: {
         limitToLast: 1,
@@ -194,16 +234,13 @@ export class FirebaseService {
     });
     return ret['position'];
   }
-  updateMyLocation() {
-    this.inputTime = Date.now();
-    navigator.geolocation.getCurrentPosition(position => this.saveMyPosition(position));
-  }
+
   refreshPeersPosition() {
     console.log('refreshPeersPosition()');
-    // console.log("refreshPeersPosition()");
+    console.log("refreshPeersPosition()");
     let data = this.peers;
     let peersPositions = [];
-    // console.log(data);
+    console.log(data);
     for (let i = 0; i < data.length; i++) {
       //  console.log("id=" + data[i].id);
     if (data[i].allowed === true) {
@@ -219,4 +256,16 @@ export class FirebaseService {
     }
     this.bsPeersPositions.next(peersPositions);
   }
+  startAutoRefresh() {
+    console.log('startAutoRefresh()');
+    this.timer = Observable.interval(1000);
+    this.autoRefreshSubscribe = this.timer.subscribe(t => {
+      this.refreshPeersPosition();
+      this.updateMyLocation();
+    });
+  }
+  stopAutoRefresh() {
+    this.autoRefreshSubscribe.unsubscribe();
+  }
+
 }

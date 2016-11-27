@@ -1,6 +1,41 @@
-.red {
-  background-color: red;
+td, tr {
+  padding: 0;
 }
-.blue {
-  background-color: blue;
+div {
+  font-style: bold;
+}
+i {
+  cursor: pointer;
+}
+.chip {
+  font-weight: bold;
+  color: white;
+  -ms-user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  cursor: pointer;
+}
+.hotpink {
+  background-color: HotPink;
+}
+.lightsalmon {
+  background-color: LightSalmon;
+}
+.lightseagreen {
+  background-color: LightSeaGreen;
+}
+.mediumturquoise {
+  background-color: MediumTurquoise;
+}
+.orange {
+  background-color: Orange;
+}
+.slateBlue {
+  background-color: SlateBlue;
+}
+.addbutton{
+  background-color: black;
+}
+.modal-add {
+  float: right;
 }

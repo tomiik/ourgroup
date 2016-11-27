@@ -9,17 +9,23 @@ import { PeerPosition } from '../position';
 })
 
 export class MapComponent implements OnInit {
+  loggedIn: boolean = false;
   title: string = 'us';
-  latitude;
-  longitude;
+  latitude: number;
+  longitude: number;
   zoom: number = 16;
   peers;
   peersPositions: PeerPosition[];
   constructor(private firebaseService: FirebaseService) {
     this.firebaseService.fbMyPosition.subscribe((positions) => this.setMyCurrentPosition(positions));
     this.firebaseService.bsPeersPositions.subscribe((peerPositions) => this.setPeersPosition(peerPositions));
+    this.firebaseService.bsLoggedIn.subscribe((status) => this.loggedIn = status);
     // this.firebaseService.myPeersList.subscribe((peers) => this.setMyPeers(peers));
     // this.setMyCurrentPosition(this.firebaseService.getMyPosition());
+    navigator.geolocation.getCurrentPosition(data => {
+      this.latitude = data.coords.latitude;
+      this.longitude = data.coords.longitude;
+    });
   }
   ngOnInit() {
   }
@@ -28,7 +34,11 @@ export class MapComponent implements OnInit {
     console.log('setPeersPosition()');
   }
   setMyCurrentPosition(data) {
-    this.latitude = data[data.length - 1].position.latitude;
-    this.longitude = data[data.length - 1].position.longitude;
+    if(this.loggedIn === true) {
+      this.latitude = data[data.length - 1].position.latitude;
+      this.longitude = data[data.length - 1].position.longitude;
+    }
+
+
   }
 }

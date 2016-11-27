@@ -43,7 +43,7 @@ export class ChatboxComponent implements OnInit {
   }
   startAutoRefresh() {
     console.log('startAutoRefresh()');
-    this.timer = Observable.timer(2000, 2000);
+    this.timer = Observable.timer(0, 20000);
     this.timer.subscribe(t => {
       this.refreshPeersPosition();
       this.updateMyLocation();
